@@ -13,6 +13,7 @@ function LoginForm({ errors, touched, values, status }) {
 
     return (
       <div className = "loginForm">
+        <h1>User Form</h1>
         <Form>
             <Field type="text" name="name" placeholder="Name" />
             {touched.name && errors.name && (
@@ -35,6 +36,12 @@ function LoginForm({ errors, touched, values, status }) {
                 />
                 <span className="checkmark" />
             </label>
+            <Field component="select" className = "userSelect" name="selectBox">
+            <option>Please Choose a Role</option>
+            <option>Front-End Developer</option>    
+            <option>Back-End Developer</option>    
+            <option>Full-Stack Developer</option>    
+            </Field>
             <button>Submit!</button>
         </Form>
 
@@ -43,18 +50,20 @@ function LoginForm({ errors, touched, values, status }) {
                 <li>Name: {user.name}</li>
                 <li>Email: {user.email}</li>
                 <li>Password: {user.password}</li>
+                <li>Role: {user.selectBox}</li>
             </ul>
         ))}
       </div>
     )
 };
 const FormikLoginForm = withFormik({
-mapPropsToValues({ name, email, password, TOS }){
+mapPropsToValues({ name, email, password, TOS, selectBox }){
     return{
         name: name || "",
         email: email || "",
         password: password || "",
-        TOS: TOS || false
+        TOS: TOS || false,
+        selectBox: selectBox || ""
     };
 },
   validationSchema: Yup.object().shape({
