@@ -1,13 +1,31 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { withFormik, Form, Field } from "formik";
+import * as Yup from "yup";
+import axios from "axios";
 
-function LoginForm({ values }) {
+function LoginForm({ errors, touched, values, status }) {
+    const [users, setUsers] = useState([]);
+    useEffect(()=> {
+        if (status) {
+            setUsers([...users, status]);
+        }
+    }, [status]);
+
     return (
       <div className = "loginForm">
         <Form>
             <Field type="text" name="name" placeholder="Name" />
-            <Field type="text" name="email" placeholder ="Email Address" />
-            <Field type="text" name="password" placeholder="Password" />
+            {touched.name && errors.name && (
+            <p className="error">{errors.name}</p> 
+             )}
+            <Field type="email" name="email" placeholder ="Email Address" />
+            {touched.email && errors.email && (
+             <p className="error">{errors.email}</p> 
+            )}
+            <Field type="password" name="password" placeholder="Password" />
+            {touched.password && errors.password && (
+             <p className="error">{errors.password}</p> 
+             )}
             <label className="checkbox-container">
                 Terms of Service
                 <Field 
@@ -19,6 +37,14 @@ function LoginForm({ values }) {
             </label>
             <button>Submit!</button>
         </Form>
+
+        {users.map(user =>(
+            <ul key = {user.id}>
+                <li>Name: {user.name}</li>
+                <li>Email: {user.email}</li>
+                <li>Password: {user.password}</li>
+            </ul>
+        ))}
       </div>
     )
 };
@@ -29,8 +55,21 @@ mapPropsToValues({ name, email, password, TOS }){
         email: email || "",
         password: password || "",
         TOS: TOS || false
-    }
-}
+    };
+},
+  validationSchema: Yup.object().shape({
+    name: Yup.string().required("Try Again!").min(2, "Try again with your real name!"),
+    email: Yup.string().required("Please Please Please put something in here").email("Try again with a valid email address!"),
+    password: Yup.string().required("Make a password to avoid identity fraud").min(6, "Try again with a beefier password!")
+  }),
+  handleSubmit(values, {setStatus}) {
+      axios
+        .post("https://reqres.in/api/users", values)
+        .then(response =>{
+            setStatus(response.data)
+            console.log(response)
+        })
+  }
 })(LoginForm)
 
 export default FormikLoginForm;
